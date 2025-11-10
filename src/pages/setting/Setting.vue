@@ -31,6 +31,7 @@ import Textarea from "@/components/base/Textarea.vue";
 import SettingItem from "@/pages/setting/SettingItem.vue";
 import { get, set } from "idb-keyval";
 import { useRuntimeStore } from "@/stores/runtime.ts";
+import { useAuthStore } from "@/stores/auth.ts";
 
 const emit = defineEmits<{
   toggleDisabledDialogEscKey: [val: boolean]
@@ -40,6 +41,7 @@ const tabIndex = $ref(0)
 const settingStore = useSettingStore()
 const runtimeStore = useRuntimeStore()
 const store = useBaseStore()
+const authStore = useAuthStore()
 
 //@ts-ignore
 const gitLastCommitHash = ref(LATEST_COMMIT_HASH);
@@ -773,6 +775,29 @@ function importOldData() {
 
         <div v-if="tabIndex === 6" class="center flex-col">
           <h1>Type Words</h1>
+          
+          <!-- 用户信息部分 -->
+          <div v-if="authStore.isLoggedIn && authStore.user" class="user-info-section mb-6">
+            <div class="user-avatar mb-4">
+              <img v-if="authStore.user.avatar" :src="authStore.user.avatar" alt="头像" class="avatar-img" />
+              <div v-else class="avatar-placeholder">
+                {{ authStore.user.nickname?.charAt(0) || 'U' }}
+              </div>
+            </div>
+            <h3 class="mb-2">{{ authStore.user.nickname || '用户' }}</h3>
+            <p v-if="authStore.user.email" class="text-sm color-gray mb-1">{{ authStore.user.email }}</p>
+            <p v-if="authStore.user.phone" class="text-sm color-gray">{{ authStore.user.phone }}</p>
+            
+            <BaseButton 
+              @click="authStore.logout" 
+              type="info" 
+              class="mt-4" 
+              :loading="authStore.isLoading"
+            >
+              退出登录
+            </BaseButton>
+          </div>
+          
           <p class="w-100 text-xl">
             感谢使用本项目！本项目是开源项目，如果觉得有帮助，请在 GitHub 点个 Star，您的支持是我持续改进的动力。
           </p>
@@ -801,6 +826,75 @@ function importOldData() {
 .log-item{
   border-bottom: 1px solid var(--color-input-border);
   margin-bottom: 1rem;
+}
+
+// 用户信息样式
+.user-info-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2rem;
+  border: 1px solid var(--color-input-border);
+  border-radius: 8px;
+  background: var(--color-bg);
+  width: 100%;
+  max-width: 400px;
+  
+  .user-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 3px solid var(--color-select-bg);
+    
+    .avatar-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    
+    .avatar-placeholder {
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 2rem;
+      font-weight: bold;
+    }
+  }
+  
+  h3 {
+    margin: 0;
+    color: var(--color-font-1);
+  }
+  
+  .text-sm {
+    font-size: 0.9rem;
+    margin: 0.25rem 0;
+  }
+  
+  .color-gray {
+    color: #666;
+  }
+  
+  .mb-1 {
+    margin-bottom: 0.25rem;
+  }
+  
+  .mb-2 {
+    margin-bottom: 0.5rem;
+  }
+  
+  .mb-4 {
+    margin-bottom: 1rem;
+  }
+  
+  .mt-4 {
+    margin-top: 1rem;
+  }
 }
 
 .setting {

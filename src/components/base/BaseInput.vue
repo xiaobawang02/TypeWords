@@ -21,6 +21,11 @@ const props = defineProps({
     default: false,
   },
   maxLength: Number,
+  size: {
+    type: String,
+    default: 'normal',
+    validator: (value: string) => ['normal', 'large'].includes(value)
+  },
 });
 
 const emit = defineEmits(['update:modelValue', 'input', 'change', 'focus', 'blur', 'validation']);
@@ -96,7 +101,7 @@ const vFocus = {
 <template>
   <div class="base-input2"
        ref="inputEl"
-       :class="{ 'is-disabled': disabled, 'has-error': errorMsg,focus }">
+       :class="{ 'is-disabled': disabled, 'has-error': errorMsg,focus, [`base-input2--${size}`]: true }">
     <slot name="subfix"></slot>
     <input
         v-bind="attrs"
@@ -133,6 +138,26 @@ const vFocus = {
   transition: all .3s;
   align-items: center;
   background: var(--color-input-bg);
+
+  // normal size (default)
+  &--normal {
+    padding: .2rem .3rem;
+    
+    .inner {
+      height: 1.5rem;
+      font-size: 1rem;
+    }
+  }
+
+  // large size
+  &--large {
+    padding: .6rem .8rem;
+    
+    .inner {
+      height: 2rem;
+      font-size: 1.125rem;
+    }
+  }
 
   &.is-disabled {
     opacity: 0.6;

@@ -59,3 +59,6 @@ export function uploadImportData(data,onUploadProgress) {
     onUploadProgress
   })
 }
+
+// 导出认证相关API
+export * from './auth'

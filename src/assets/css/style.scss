@@ -219,6 +219,9 @@ a {
   text-decoration: none;
 }
 
+.cp{
+  @apply cursor-pointer;
+}
 
 @supports selector(::-webkit-scrollbar) {
   ::-webkit-scrollbar {

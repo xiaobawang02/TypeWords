@@ -12,6 +12,8 @@ import BookList from "@/pages/article/BookList.vue";
 import Setting from "@/pages/setting/Setting.vue";
 import Login from "@/pages/user/login.vue";
 import User from "@/pages/user/index.vue";
+import WechatCallback from "@/pages/user/wechat-callback.vue";
+import { useAuthStore } from "@/stores/auth.ts";
 
 export const routes: RouteRecordRaw[] = [
   {
@@ -39,7 +41,7 @@ export const routes: RouteRecordRaw[] = [
   },
   {path: '/batch-edit-article', component: () => import("@/pages/article/BatchEditArticlePage.vue")},
   {path: '/test', component: () => import("@/pages/test/test.vue")},
-  {path: '/:pathMatch(.*)*', redirect: '/word'},
+  {path: '/:pathMatch(.*)*', redirect: '/words'},
 ]
 
 const router = VueRouter.createRouter({
@@ -56,7 +58,27 @@ const router = VueRouter.createRouter({
   },
 })
 
-router.beforeEach((to: any, from: any) => {
+// 路由守卫
+router.beforeEach(async (to: any, from: any) => {
+  const authStore = useAuthStore()
+  
+  // 公共路由，不需要登录验证
+  const publicRoutes = ['/login', '/wechat/callback']
+  
+  // 如果目标路由是公共路由，直接放行
+  if (publicRoutes.includes(to.path)) {
+    return true
+  }
+  
+  // 如果用户未登录，跳转到登录页
+  if (!authStore.isLoggedIn) {
+    // 尝试初始化认证状态
+    const isInitialized = await authStore.initAuth()
+    if (!isInitialized) {
+      return { path: '/login', query: { redirect: to.fullPath } }
+    }
+  }
+  
   return true
   // console.log('beforeEach-to',to.path)
   // console.log('beforeEach-from',from.path)
