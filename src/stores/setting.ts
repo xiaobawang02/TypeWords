@@ -1,9 +1,9 @@
-import { defineStore } from "pinia"
-import { checkAndUpgradeSaveSetting, cloneDeep } from "@/utils";
+import {defineStore} from "pinia"
+import {checkAndUpgradeSaveSetting, cloneDeep} from "@/utils";
 import {DefaultShortcutKeyMap, WordPracticeMode, WordPracticeType} from "@/types/types.ts";
-import { get } from "idb-keyval";
-import { CAN_REQUEST, SAVE_SETTING_KEY } from "@/config/env.ts";
-import { getSetting } from "@/apis";
+import {get} from "idb-keyval";
+import {CAN_REQUEST, SAVE_SETTING_KEY} from "@/config/env.ts";
+import {getSetting} from "@/apis";
 
 export interface SettingState {
   soundType: string,
@@ -53,6 +53,7 @@ export interface SettingState {
   disableShowPracticeSettingDialog: boolean // 不默认显示练习设置弹框
   autoNextWord: boolean //自动切换下一个单词
   inputWrongClear: boolean //单词输入错误，清空已输入内容
+  ignoreSymbol: boolean //过滤符号
 }
 
 export const getDefaultSettingState = (): SettingState => ({
@@ -103,6 +104,7 @@ export const getDefaultSettingState = (): SettingState => ({
   disableShowPracticeSettingDialog: false,
   autoNextWord: true,
   inputWrongClear: false,
+  ignoreSymbol: true
 })
 
 export const useSettingStore = defineStore('setting', {

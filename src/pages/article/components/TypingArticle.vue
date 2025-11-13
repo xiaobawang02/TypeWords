@@ -1,25 +1,24 @@
 <script setup lang="ts">
-import { inject, onMounted, onUnmounted, watch } from "vue"
+import {inject, onMounted, onUnmounted, watch} from "vue"
 import {Article, ArticleWord, PracticeArticleWordType, Sentence, ShortcutKey, Word} from "@/types/types.ts";
-import { useBaseStore } from "@/stores/base.ts";
-import { useSettingStore } from "@/stores/setting.ts";
-import { usePlayBeep, usePlayCorrect, usePlayKeyboardAudio } from "@/hooks/sound.ts";
+import {useBaseStore} from "@/stores/base.ts";
+import {useSettingStore} from "@/stores/setting.ts";
+import {usePlayBeep, usePlayCorrect, usePlayKeyboardAudio} from "@/hooks/sound.ts";
 import {emitter, EventKey, useEvents} from "@/utils/eventBus.ts";
-import { _dateFormat, _nextTick, msToHourMinute, msToMinute, total } from "@/utils";
+import {_dateFormat, _nextTick, msToHourMinute, total} from "@/utils";
 import '@imengyu/vue3-context-menu/lib/vue3-context-menu.css'
 import ContextMenu from '@imengyu/vue3-context-menu'
-import { getTranslateText } from "@/hooks/article.ts";
 import BaseButton from "@/components/BaseButton.vue";
 import QuestionForm from "@/pages/article/components/QuestionForm.vue";
-import { getDefaultArticle, getDefaultWord } from "@/types/func.ts";
+import {getDefaultArticle, getDefaultWord} from "@/types/func.ts";
 import Toast from '@/components/base/toast/Toast.ts'
 import TypingWord from "@/pages/article/components/TypingWord.vue";
 import Space from "@/pages/article/components/Space.vue";
-import { useWordOptions } from "@/hooks/dict.ts";
+import {useWordOptions} from "@/hooks/dict.ts";
 import nlp from "compromise/three";
-import { nanoid } from "nanoid";
-import { usePracticeStore } from "@/stores/practice.ts";
-import { PracticeSaveArticleKey } from "@/config/env.ts";
+import {nanoid} from "nanoid";
+import {usePracticeStore} from "@/stores/practice.ts";
+import {PracticeSaveArticleKey} from "@/config/env.ts";
 
 interface IProps {
   article: Article,
@@ -263,7 +262,12 @@ function onTyping(e: KeyboardEvent) {
       // 检查下一个单词是否存在
       if (wordIndex + 1 < currentSentence.words.length) {
         wordIndex++;
-        emit('nextWord', currentWord);
+        currentWord =  currentSentence.words[wordIndex]
+        if ([PracticeArticleWordType.Symbol,PracticeArticleWordType.Number].includes(currentWord.type) && settingStore.ignoreSymbol){
+          next()
+        }else {
+          emit('nextWord', currentWord);
+        }
       } else {
         nextSentence()
       }

@@ -619,8 +619,12 @@ function importOldData() {
             <Slider v-model="settingStore.articleSoundSpeed" :step="0.1" :min="0.5" :max="3"/>
             <span class="w-10 pl-5">{{ settingStore.articleSoundSpeed }}</span>
           </SettingItem>
-        </div>
 
+          <div class="line"></div>
+          <SettingItem title="输入时忽略符号/数字">
+            <Switch v-model="settingStore.ignoreSymbol"/>
+          </SettingItem>
+        </div>
 
         <div class="body" v-if="tabIndex === 3">
           <div class="row">

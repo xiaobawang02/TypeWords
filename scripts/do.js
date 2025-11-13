@@ -10,6 +10,7 @@ async function generateSitemap() {
 
   // 静态路由（首页、练习页等）
   const staticPages = [
+    {url: '/index.html', changefreq: 'monthly', priority: 1.0},
     {url: '/', changefreq: 'daily', priority: 1.0},
     {url: '/words', changefreq: 'daily', priority: 0.9},
     {url: '/articles', changefreq: 'daily', priority: 0.9},
