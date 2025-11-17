@@ -163,7 +163,7 @@
 
   async function readAllStorageForMigration() {
     const local = readLocalStorageKeys(['PracticeSaveWord', 'PracticeSaveArticle']);
-    const indexed = await readIndexedDBCompatible(name);
+    const indexed = await readIndexedDBCompatible(name, keys);
     return {localStorage: local, indexedDB: indexed.indexedDB ?? {}};
   }
 
