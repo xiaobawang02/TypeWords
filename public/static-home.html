@@ -214,6 +214,7 @@
             transform: translate(-50%, -50%);
             background: rgb(247, 247, 247);
             width: 30rem;
+            max-width: 85vw;
             border-radius: 1rem;
             display: none;
             opacity: 0;
@@ -310,7 +311,7 @@
         }
 
         .container {
-            width: min(1200px, 90%);
+            width: min(1200px, 92%);
         }
 
         .sky-img {
@@ -324,6 +325,27 @@
             margin-bottom: 1.2rem;
             gap: 1rem;
         }
+
+        .card { width: auto; }
+
+        @media (max-width: 768px) {
+            h1 { font-size: 3rem !important; }
+            .content { margin-top: 4rem; gap: 1.4rem; }
+            .base-button { width: 100%; margin: .5rem 0; height: 2.8rem; font-size: 1rem; }
+            .base-button + .base-button{margin-left: 0;}
+            .bottom { flex-direction: column; align-items: flex-start; gap: .6rem; }
+            .sky a { width: 100% !important; }
+            .sky-img { width: 100%; }
+        }
+
+        @media (max-width: 480px) {
+            h1 { font-size: 2.4rem !important; }
+            .content { margin-top: 3.2rem; gap: 1.2rem; }
+        }
+
+
+        html, body { -webkit-tap-highlight-color: transparent; }
+        .icon { padding: .2rem; }
 
         .bottom {
             display: flex;
