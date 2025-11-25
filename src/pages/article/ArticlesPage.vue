@@ -18,7 +18,7 @@ import dayjs from "dayjs";
 import isBetween from "dayjs/plugin/isBetween";
 import isoWeek from 'dayjs/plugin/isoWeek'
 import { useFetch } from "@vueuse/core";
-import { AppEnv, DICT_LIST, PracticeSaveArticleKey } from "@/config/env.ts";
+import {AppEnv, DICT_LIST, Host, PracticeSaveArticleKey} from "@/config/env.ts";
 import { myDictList } from "@/apis";
 
 dayjs.extend(isoWeek)
@@ -162,11 +162,16 @@ const weekList = $computed(() => {
 
 const {data: recommendBookList, isFetching} = useFetch(resourceWrap(DICT_LIST.ARTICLE.RECOMMENDED)).json()
 
+let isNewHost = $ref(window.location.host === Host)
 
 </script>
 
 <template>
   <BasePage>
+    <div class="mb-4" v-if="!isNewHost">
+      新域名已启用，后续请访问 <a href="https://typewords.cc/words?from_old_site=1">https://typewords.cc</a>。当前 2study.top 域名将在不久后停止使用
+    </div>
+
     <div class="card flex flex-col md:flex-row justify-between gap-space p-4 md:p-6">
       <div class="">
         <Book

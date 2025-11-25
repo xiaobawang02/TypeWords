@@ -1,17 +1,17 @@
 <script setup lang="ts">
-import { nextTick, ref, watch } from "vue";
-import { useSettingStore } from "@/stores/setting.ts";
-import { getAudioFileUrl, usePlayAudio } from "@/hooks/sound.ts";
-import { getShortcutKey, useEventListener } from "@/hooks/event.ts";
-import { checkAndUpgradeSaveDict, checkAndUpgradeSaveSetting, cloneDeep, loadJsLib, shakeCommonDict } from "@/utils";
-import { DefaultShortcutKeyMap, ShortcutKey, WordPracticeMode } from "@/types/types.ts";
+import {nextTick, onMounted, ref, watch} from "vue";
+import {useSettingStore} from "@/stores/setting.ts";
+import {getAudioFileUrl, usePlayAudio} from "@/hooks/sound.ts";
+import {getShortcutKey, useEventListener} from "@/hooks/event.ts";
+import {checkAndUpgradeSaveDict, checkAndUpgradeSaveSetting, cloneDeep, loadJsLib, shakeCommonDict} from "@/utils";
+import {DefaultShortcutKeyMap, ShortcutKey, WordPracticeMode} from "@/types/types.ts";
 import BaseButton from "@/components/BaseButton.vue";
 import VolumeIcon from "@/components/icon/VolumeIcon.vue";
-import { useBaseStore } from "@/stores/base.ts";
-import { saveAs } from "file-saver";
+import {useBaseStore} from "@/stores/base.ts";
+import {saveAs} from "file-saver";
 import {
   APP_NAME, APP_VERSION, EMAIL,
-  EXPORT_DATA_KEY, GITHUB,
+  EXPORT_DATA_KEY, GITHUB, Host,
   LOCAL_FILE_KEY,
   Origin,
   PracticeSaveArticleKey,
@@ -20,7 +20,7 @@ import {
 import dayjs from "dayjs";
 import BasePage from "@/components/BasePage.vue";
 import Toast from '@/components/base/toast/Toast.ts'
-import { Option, Select } from "@/components/base/select";
+import {Option, Select} from "@/components/base/select";
 import Switch from "@/components/base/Switch.vue";
 import Slider from "@/components/base/Slider.vue";
 import RadioGroup from "@/components/base/radio/RadioGroup.vue";
@@ -29,10 +29,11 @@ import InputNumber from "@/components/base/InputNumber.vue";
 import PopConfirm from "@/components/PopConfirm.vue";
 import Textarea from "@/components/base/Textarea.vue";
 import SettingItem from "@/pages/setting/SettingItem.vue";
-import { get, set } from "idb-keyval";
-import { useRuntimeStore } from "@/stores/runtime.ts";
-import { useUserStore } from "@/stores/user.ts";
-import { useExport } from "@/hooks/export.ts";
+import {get, set} from "idb-keyval";
+import {useRuntimeStore} from "@/stores/runtime.ts";
+import {useUserStore} from "@/stores/user.ts";
+import {useExport} from "@/hooks/export.ts";
+import MigrateDialog from "@/components/MigrateDialog.vue";
 
 const emit = defineEmits<{
   toggleDisabledDialogEscKey: [val: boolean]
@@ -42,7 +43,6 @@ const tabIndex = $ref(0)
 const settingStore = useSettingStore()
 const runtimeStore = useRuntimeStore()
 const store = useBaseStore()
-const userStore = useUserStore()
 
 //@ts-ignore
 const gitLastCommitHash = ref(LATEST_COMMIT_HASH);
@@ -99,7 +99,7 @@ useEventListener('keydown', (e: KeyboardEvent) => {
     } else {
       // 忽略单独的修饰键
       if (shortcutKey === 'Ctrl+' || shortcutKey === 'Alt+' || shortcutKey === 'Shift+' ||
-          e.key === 'Control' || e.key === 'Alt' || e.key === 'Shift') {
+        e.key === 'Control' || e.key === 'Alt' || e.key === 'Shift') {
         return;
       }
 
@@ -300,6 +300,15 @@ function importOldData() {
     }
   }, 1000)
 }
+
+let isNewHost = $ref(window.location.host === Host)
+
+let showTransfer = $ref(false)
+function transferOk() {
+  setTimeout(() => {
+    window.location.href = '/words'
+  }, 1500)
+}
 </script>
 
 <template>
@@ -372,8 +381,8 @@ function importOldData() {
                        v-if="settingStore.ignoreSimpleWord"
           >
             <Textarea
-                placeholder="多个单词用英文逗号隔号"
-                v-model="simpleWords" :autosize="{minRows: 6, maxRows: 10}"/>
+              placeholder="多个单词用英文逗号隔号"
+              v-model="simpleWords" :autosize="{minRows: 6, maxRows: 10}"/>
           </SettingItem>
 
           <!--          音效-->
@@ -401,16 +410,16 @@ function importOldData() {
                     class="w-50!"
             >
               <Option
-                  v-for="item in SoundFileOptions"
-                  :key="item.value"
-                  :label="item.label"
-                  :value="item.value"
+                v-for="item in SoundFileOptions"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value"
               >
                 <div class="flex justify-between items-center w-full">
                   <span>{{ item.label }}</span>
                   <VolumeIcon
-                      :time="100"
-                      @click="usePlayAudio(getAudioFileUrl(item.value)[0])"/>
+                    :time="100"
+                    @click="usePlayAudio(getAudioFileUrl(item.value)[0])"/>
                 </div>
               </Option>
             </Select>
@@ -528,16 +537,16 @@ function importOldData() {
           <SettingItem mainTitle="字体设置"/>
           <SettingItem title="外语字体">
             <Slider
-                :min="10"
-                :max="100"
-                v-model="settingStore.fontSize.wordForeignFontSize"/>
+              :min="10"
+              :max="100"
+              v-model="settingStore.fontSize.wordForeignFontSize"/>
             <span class="w-10 pl-5">{{ settingStore.fontSize.wordForeignFontSize }}px</span>
           </SettingItem>
           <SettingItem title="中文字体">
             <Slider
-                :min="10"
-                :max="100"
-                v-model="settingStore.fontSize.wordTranslateFontSize"/>
+              :min="10"
+              :max="100"
+              v-model="settingStore.fontSize.wordTranslateFontSize"/>
             <span class="w-10 pl-5">{{ settingStore.fontSize.wordTranslateFontSize }}px</span>
           </SettingItem>
         </div>
@@ -550,7 +559,6 @@ function importOldData() {
           <!--          发音-->
           <!--          发音-->
           <!--          发音-->
-          <div class="line"></div>
           <SettingItem mainTitle="音效"/>
           <SettingItem title="自动播放句子">
             <Switch v-model="settingStore.articleSound"/>
@@ -586,7 +594,7 @@ function importOldData() {
                   <input ref="shortcutInput" :value="item[1]?item[1]:'未设置快捷键'" readonly type="text"
                          @blur="handleInputBlur">
                   <span @click.stop="editShortcutKey = ''">按键盘进行设置，<span
-                      class="text-red!">设置完成点击这里</span></span>
+                    class="text-red!">设置完成点击这里</span></span>
                 </div>
                 <div v-else>
                   <div v-if="item[1]">{{ item[1] }}</div>
@@ -623,11 +631,20 @@ function importOldData() {
                      @change="importData">
             </div>
             <PopConfirm
-                title="导入老版本数据前，请先备份当前数据，确定要导入老版本数据吗？"
-                @confirm="importOldData">
+              title="导入老版本数据前，请先备份当前数据，确定要导入老版本数据吗？"
+              @confirm="importOldData">
               <BaseButton>老版本数据导入</BaseButton>
             </PopConfirm>
           </div>
+
+          <template v-if="!isNewHost">
+            <div class="line my-3"></div>
+            <div>请注意，如果本地已有使用记录，请先备份当前数据，迁移数据后将<b class="text-red"> 完全覆盖 </b>当前所有数据，请谨慎操作。
+            </div>
+            <div class="flex gap-space mt-3">
+              <BaseButton @click="showTransfer = true">迁移 2study.top 网站数据</BaseButton>
+            </div>
+          </template>
         </div>
 
         <div v-if="tabIndex === 5">
@@ -798,29 +815,6 @@ function importOldData() {
 
         <div v-if="tabIndex === 6" class="center flex-col">
           <h1>Type Words</h1>
-
-          <!-- 用户信息部分 -->
-          <div v-if="userStore.isLoggedIn && userStore.user" class="user-info-section mb-6">
-            <div class="user-avatar mb-4">
-              <img v-if="userStore.user.avatar" :src="userStore.user.avatar" alt="头像" class="avatar-img"/>
-              <div v-else class="avatar-placeholder">
-                {{ userStore.user.nickname?.charAt(0) || 'U' }}
-              </div>
-            </div>
-            <h3 class="mb-2">{{ userStore.user.nickname || '用户' }}</h3>
-            <p v-if="userStore.user.email" class="text-sm color-gray mb-1">{{ userStore.user.email }}</p>
-            <p v-if="userStore.user.phone" class="text-sm color-gray">{{ userStore.user.phone }}</p>
-
-            <BaseButton
-                @click="userStore.logout"
-                type="info"
-                class="mt-4"
-                :loading="userStore.isLoading"
-            >
-              退出登录
-            </BaseButton>
-          </div>
-
           <p class="w-100 text-xl">
             感谢使用本项目！本项目是开源项目，如果觉得有帮助，请在 GitHub 点个 Star，您的支持是我持续改进的动力。
           </p>
@@ -837,10 +831,14 @@ function importOldData() {
             Build {{ gitLastCommitHash }}
           </div>
         </div>
-
       </div>
     </div>
   </BasePage>
+
+  <MigrateDialog
+    v-model="showTransfer"
+    @ok="transferOk"
+  />
 </template>
 
 <style scoped lang="scss">
@@ -1054,85 +1052,85 @@ function importOldData() {
 @media (max-width: 768px) {
   .setting {
     flex-direction: column;
-    
+
     .left {
       width: 100%;
       border-right: none;
       border-bottom: 2px solid gainsboro;
-      
+
       .tabs {
         flex-direction: row;
         overflow-x: auto;
         padding: 0.5rem;
         gap: 0.3rem;
-        
+
         .tab {
           white-space: nowrap;
           padding: 0.4rem 0.6rem;
           font-size: 0.9rem;
-          
+
           span {
             display: none;
           }
         }
       }
     }
-    
+
     .content {
       padding: 0 1rem;
-      
+
       .row {
         flex-direction: column;
         align-items: flex-start;
         gap: 0.5rem;
         min-height: auto;
         padding: 0.5rem 0;
-        
+
         .wrapper {
           width: 100%;
           justify-content: flex-start;
-          
+
           .set-key {
             width: 100%;
-            
+
             input {
               width: 100%;
               max-width: 200px;
             }
           }
-          
+
           // 补充：选择器和输入框优化
           .base-select, .base-input {
             width: 100% !important;
             max-width: none;
           }
-          
+
           // 单选按钮组优化
           .radio-group {
             flex-direction: column;
             gap: 0.5rem;
-            
+
             .radio {
               min-height: 44px;
               width: 100%;
             }
           }
-          
+
           // 滑块优化
           .slider {
             width: 100%;
           }
         }
-        
+
         .main-title {
           font-size: 1rem;
         }
-        
+
         .item-title {
           font-size: 0.9rem;
         }
       }
-      
+
       .body {
         height: auto;
         max-height: 60vh;

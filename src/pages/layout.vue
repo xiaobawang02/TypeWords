@@ -17,6 +17,9 @@ const {toggleTheme, getTheme} = useTheme()
 function goHome() {
   window.location.href = '/';
 }
+function goFeedback() {
+  window.open('https://v.wjx.cn/vm/ev0W7fv.aspx#', '_blank');
+}
 </script>
 
 <template>
@@ -43,6 +46,10 @@ function goHome() {
           <IconFluentSettings20Regular/>
           <span v-if="settingStore.sideExpand">设置</span>
           <div class="red-point" :class="!settingStore.sideExpand && 'top-1 right-0'" v-if="runtimeStore.isNew"></div>
+        </div>
+        <div class="row" @click="goFeedback">
+          <IconFluentCommentEdit20Regular/>
+          <span v-if="settingStore.sideExpand">建议反馈</span>
         </div>
 <!--        <div class="row" @click="router.push('/user')">-->
 <!--          <IconFluentPerson20Regular/>-->
